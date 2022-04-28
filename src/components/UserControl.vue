@@ -52,26 +52,28 @@
           </tr>
         </thead>
         <tbody id="resultTbody">
+        <template v-for="(item, index) in userListDisplay" :key="index">
           <tr>
             <td class="data-td">
-              1
+              {{ item.id }}
             </td>
             <td class="data-td">
-              DiscoloR
+              {{ item.username }}
             </td>
             <td class="data-td">
-              xxxxx
+              {{ item.realname }}
             </td>
             <td class="data-td">
-              y
+              {{ item.role_admin }}
             </td>
             <td class="data-td">
-              n
+              {{ item.role_dba }}
             </td>
             <td class="data-td">
-              y
+              {{ item.role_user }}
             </td>
           </tr>
+        </template>
         </tbody>
       </table>
     </div>
@@ -107,7 +109,35 @@ export default {
     let username = ref('')
     let password = ref('')
     let realname = ref('')
-    let userList = []
+    let userListDisplay = ref([])
+
+    function toListDisplay(userListResult){
+      userListDisplay.value = []
+      userListResult.forEach(element=>{
+        let user = {
+          id:'',
+          username:'',
+          realname:'',
+          role_admin:'n',
+          role_dba:'n',
+          role_user:'n'
+        }
+        user.id = element.id
+        user.username = element.username
+        user.realname = element.realname
+        let authList = element.authorityList
+        authList.forEach(auth=>{
+          if(auth.rolename === 'ROLE_ADMIN'){
+            user.role_admin = 'y'
+          }else if(auth.rolename === 'ROLE_DBA'){
+            user.role_dba = 'y'
+          }else if(auth.rolename === 'ROLE_USER'){
+            user.role_user = 'y'
+          }
+        })
+        userListDisplay.value.push(user)
+      })
+    }
 
     function queryUser(){
       axios({
@@ -124,12 +154,13 @@ export default {
       }).then(response=>{
         let result=response.data
         if(result.status===0){
-          userList = result.data
+          let userListResult = result.data
+          toListDisplay(userListResult)
         }else {
           throw 'something went wrong'
         }
       }).catch(response=>{
-        console.log(response.data.msg)
+        console.log(response)
       })
     }
 
@@ -153,7 +184,8 @@ export default {
       }).then(response=>{
         let result=response.data
         if(result.status===0){
-          userList = result.data
+          let userListResult = result.data
+          toListDisplay(userListResult)
         }else {
           throw 'something went wrong'
         }
@@ -176,7 +208,7 @@ export default {
       chagneUserOption,
       queryUser,
       updateUser,
-      userList
+      userListDisplay
     }
   }
 }
@@ -188,6 +220,7 @@ export default {
 }
 
 .user-ctrl-area {
+  backdrop-filter: blur(1px);
   background-color: rgba(0, 0, 0, 0.3);
   margin-top: 35px;
   height: 80%;

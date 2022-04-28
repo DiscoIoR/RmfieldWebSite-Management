@@ -81,10 +81,14 @@
 <script>
 import {ref} from "vue";
 import axios from "axios";
+import {getCookie} from "@/router/getCookie";
 
 export default {
   name: "UserControl",
   setup(){
+    let token = getCookie('token')
+
+
     let admin_checked = ref(false)
     let dba_checked = ref(false)
     let user_checked = ref(false)
@@ -109,6 +113,9 @@ export default {
       axios({
         url:'/admin/api/user-ctrl',
         method:'get',
+        headers: {
+          'token': token
+        },
         params:{
           id:id.value,
           username:username.value,
@@ -130,14 +137,18 @@ export default {
       axios({
         url:'/admin/api/user-ctrl',
         method:'put',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': token
+        },
         data:JSON.stringify({
           id:id.value,
           username:username.value,
           password:password.value,
           realname:realname.value,
-          role_admin:admin_checked.value,
-          role_dba:dba_checked.value,
-          role_user:user_checked.value
+          ROLE_ADMIN:admin_checked.value,
+          ROLE_DBA:dba_checked.value,
+          ROLE_USER:user_checked.value
         })
       }).then(response=>{
         let result=response.data

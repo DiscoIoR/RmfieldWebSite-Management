@@ -41,9 +41,6 @@ const router = VueRouter.createRouter({
 
 router.beforeEach((to, from, next) => {
 
-    //TODO 这行是为了方便前端开发，实际运行环境需要删除
-    next()
-
     //如果访问的url需要授权,则校验登录状态
     if (to.meta.requiresAuth) {
         let token = getCookie('token')
